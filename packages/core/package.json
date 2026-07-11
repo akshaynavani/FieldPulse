@@ -1,0 +1,27 @@
+{
+  "name": "@fieldpulse/core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Platform-agnostic sales domain logic shared by mobile, web and API",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch",
+    "lint": "eslint src test --ext .ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@fieldpulse/contracts": "*"
+  }
+}
