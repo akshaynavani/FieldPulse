@@ -18,7 +18,7 @@ function jsonResponse(status: number, body: unknown) {
 }
 
 function setup(response: Response | Error, token: string | null = "t".repeat(48)) {
-  const fetchMock = vi.fn(async () => {
+  const fetchMock = vi.fn(async (_url: string, _init?: RequestInit) => {
     if (response instanceof Error) throw response;
     return response;
   });
@@ -37,9 +37,9 @@ describe("FieldPulseClient", () => {
     const { client, fetchMock } = setup(jsonResponse(200, user));
     const me = await client.me();
     expect(me.email).toBe("rep@example.com");
-    const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    const [url, init] = fetchMock.mock.calls[0]!;
     expect(url).toBe("https://api.example.com/auth/me");
-    expect((init.headers as Record<string, string>).Authorization).toMatch(/^Bearer t+/);
+    expect((init!.headers as Record<string, string>).Authorization).toMatch(/^Bearer t+/);
   });
 
   it("builds query strings and skips empty values", async () => {
