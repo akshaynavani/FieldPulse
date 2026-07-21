@@ -29,3 +29,19 @@ export function validateQuery(schema: z.ZodTypeAny): RequestHandler {
 export function validQuery<T>(req: { validQuery?: unknown }): T {
   return req.validQuery as T;
 }
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * router.param handler: a malformed id can never match a row, so answer 404 instead
+ * of letting Postgres raise an "invalid input syntax for type uuid" error.
+ */
+export const uuidParam = (
+  _req: Parameters<RequestHandler>[0],
+  _res: Parameters<RequestHandler>[1],
+  next: Parameters<RequestHandler>[2],
+  value: string,
+) => {
+  if (!UUID_RE.test(value)) return next(new HttpError("not_found", "Resource not found"));
+  next();
+};

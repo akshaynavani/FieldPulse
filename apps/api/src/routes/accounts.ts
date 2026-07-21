@@ -15,11 +15,12 @@ import {
 } from "@fieldpulse/contracts";
 import { asyncHandler, notFound } from "../errors.js";
 import { currentUser, scopeFor } from "../middleware/auth.js";
-import { validQuery, validateBody, validateQuery } from "../middleware/validate.js";
+import { uuidParam, validQuery, validateBody, validateQuery } from "../middleware/validate.js";
 import type { Deps } from "./deps.js";
 
 export function accountsRouter({ repo }: Deps): Router {
   const router = Router();
+  router.param("id", uuidParam);
 
   router.get(
     "/",

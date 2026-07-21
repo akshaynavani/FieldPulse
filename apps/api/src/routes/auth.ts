@@ -3,12 +3,13 @@ import type { LoginRequest, LoginResponse, SessionListResponse } from "@fieldpul
 import { LoginRequestSchema } from "@fieldpulse/contracts";
 import { HttpError, asyncHandler } from "../errors.js";
 import { currentUser, requireAuth } from "../middleware/auth.js";
-import { validateBody } from "../middleware/validate.js";
+import { uuidParam, validateBody } from "../middleware/validate.js";
 import { DUMMY_HASH, verifyPassword } from "../services/passwords.js";
 import type { Deps } from "./deps.js";
 
 export function authRouter({ repo, sessions }: Deps): Router {
   const router = Router();
+  router.param("id", uuidParam);
   const auth = requireAuth(sessions);
 
   router.post(
