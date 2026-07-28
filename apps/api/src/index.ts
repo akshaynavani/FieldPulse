@@ -6,10 +6,7 @@ import { PgRepository } from "./repositories/pg.js";
 import { SessionService } from "./services/sessions.js";
 
 const config = loadConfig();
-const logger = pino({
-  level: config.LOG_LEVEL,
-  ...(config.NODE_ENV === "development" ? { transport: { target: "pino/file", options: { destination: 1 } } } : {}),
-});
+const logger = pino({ level: config.LOG_LEVEL });
 
 const pool = createPool(config.DATABASE_URL, config.DATABASE_SSL);
 const repo = new PgRepository(pool);
