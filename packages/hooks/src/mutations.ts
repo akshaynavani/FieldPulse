@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import type {
-  CompleteVisit,
   Deal,
   DealListResponse,
   DealStage,
@@ -114,7 +113,7 @@ export function useCompleteVisit() {
   const { client, offlineQueue } = useApi();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (v: { visitId: string; body: Partial<CompleteVisit> & Pick<CompleteVisit, "completedAt" | "outcome"> }) =>
+    mutationFn: (v: { visitId: string; body: CallArgs<"completeVisit">["body"] }) =>
       runOrQueue(client, offlineQueue, "completeVisit", { params: { id: v.visitId }, body: v.body }),
     onSuccess: (result) => {
       if (result.queued) return;
