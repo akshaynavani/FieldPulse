@@ -88,9 +88,13 @@ export class OfflineQueue {
     this.listeners.forEach((l) => l(items.length));
   }
 
-  async enqueue<P>(kind: string, payload: P): Promise<QueuedMutation<P>> {
+  /**
+   * Add a mutation. Pass `id` when the caller already tried the request live with an
+   * idempotency key, so the replay reuses that key.
+   */
+  async enqueue<P>(kind: string, payload: P, id?: string): Promise<QueuedMutation<P>> {
     const mutation: QueuedMutation<P> = {
-      id: this.generateId(),
+      id: id ?? this.generateId(),
       kind,
       payload,
       createdAt: this.now().toISOString(),
@@ -150,6 +154,11 @@ export class OfflineQueue {
 }
 
 /** Simple in-memory storage, handy for tests and SSR. */
+/** Generate an id suitable for an Idempotency-Key. */
+export function newMutationId(): string {
+  return defaultId();
+}
+
 export class MemoryStorage implements KeyValueStorage {
   private map = new Map<string, string>();
   async getItem(key: string) {
