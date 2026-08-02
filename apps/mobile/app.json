@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "FieldPulse",
+    "slug": "fieldpulse",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "scheme": "fieldpulse",
+    "ios": {
+      "bundleIdentifier": "dev.fieldpulse.app",
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "FieldPulse uses your location to plan visit routes and verify on-site check-ins."
+      }
+    },
+    "android": {
+      "package": "dev.fieldpulse.app",
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
+    },
+    "plugins": ["expo-secure-store", "expo-location"]
+  }
+}
