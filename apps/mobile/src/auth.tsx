@@ -1,7 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { Platform } from "react-native";
 import { useQueryClient } from "@tanstack/react-query";
-import type { User } from "@fieldpulse/contracts";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { UserSchema, type User } from "@fieldpulse/contracts";
+import { NetworkError } from "@fieldpulse/api-client";
 import { queryKeys } from "@fieldpulse/hooks";
 import { client, offlineQueue, onUnauthorized, setToken } from "./api";
 import { tokenStore } from "./storage";
@@ -17,6 +19,15 @@ interface AuthContextValue {
   signOut: () => Promise<void>;
 }
 
+const USER_KEY = "fieldpulse.user";
+
+async function cachedUser(): Promise<User | null> {
+  const raw = await AsyncStorage.getItem(USER_KEY);
+  if (!raw) return null;
+  const parsed = UserSchema.safeParse(JSON.parse(raw));
+  return parsed.success ? parsed.data : null;
+}
+
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -26,6 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const clearLocal = useCallback(async () => {
     setToken(null);
     await tokenStore.clear();
+    await AsyncStorage.removeItem(USER_KEY);
     await offlineQueue.clear();
     qc.clear();
     setState({ status: "signedOut" });
@@ -42,9 +54,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const user = await client.me();
         qc.setQueryData(queryKeys.me, user);
         setState({ status: "signedIn", user });
-      } catch {
-        // Offline at launch: keep the token and let queries retry once online.
-        setState({ status: "signedOut" });
+      } catch (err) {
+        // Offline at launch: trust the cached profile so reps can keep working;
+        // a 401 once back online will sign them out via onUnauthorized.
+        const user = err instanceof NetworkError ? await cachedUser() : null;
+        if (user) {
+          qc.setQueryData(queryKeys.me, user);
+          setState({ status: "signedIn", user });
+        } else {
+          setState({ status: "signedOut" });
+        }
       }
     })();
   }, [clearLocal, qc]);
@@ -57,6 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         deviceLabel: `FieldPulse ${Platform.OS} app`,
       });
       await tokenStore.set(res.token);
+      await AsyncStorage.setItem(USER_KEY, JSON.stringify(res.user));
       setToken(res.token);
       qc.setQueryData(queryKeys.me, res.user);
       setState({ status: "signedIn", user: res.user });
