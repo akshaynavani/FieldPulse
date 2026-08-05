@@ -33,7 +33,6 @@ export function useAutoSync() {
 
   useEffect(() => {
     if (online) flush.mutate();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [online]);
 
   useEffect(() => {
@@ -41,7 +40,6 @@ export function useAutoSync() {
       if (state === "active") flush.mutate();
     });
     return () => sub.remove();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { online, flush };
