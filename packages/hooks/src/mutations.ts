@@ -157,3 +157,22 @@ export function useFlushQueue() {
     },
   });
 }
+
+export function useCreateAccount() {
+  const { client } = useApi();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: CallArgs<"createAccount">["body"]) => client.call("createAccount", { body }),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ["accounts"] }),
+  });
+}
+
+export function useAddContact(accountId: string) {
+  const { client } = useApi();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: CallArgs<"addContact">["body"]) =>
+      client.call("addContact", { params: { id: accountId }, body }),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: queryKeys.account(accountId) }),
+  });
+}
