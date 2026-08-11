@@ -15,6 +15,7 @@ Actions runs lint, typecheck, tests and builds for every package.
 | Contracts | `@fieldpulse/contracts` — Zod schemas, types inferred with `z.infer` | One source of truth; validated on server *and* client |
 | Shared logic | `@fieldpulse/core` — pure TS (pipeline math, quota, visit planning, offline queue) | Runs identically on mobile, web, and API; trivially unit-tested |
 | API client | `@fieldpulse/api-client` — fetch wrapper that parses every response with Zod | Contract drift fails loudly instead of silently |
+| Shared React state | `@fieldpulse/hooks` — React Query hooks + offline-aware mutations used by both apps | Mobile and web share data fetching, cache keys and optimistic updates |
 | Backend | Express + `pg`, SQL migrations, opaque session tokens stored hashed in Postgres | "PostgreSQL for session persistence"; revocable sessions, no JWT secrets on device |
 | Mobile | Expo (React Native) + React Navigation, SecureStore for token | Fast cross-platform setup |
 | Web | Vite + React + React Router, localStorage token | Lightweight web target sharing the same packages |
@@ -58,7 +59,10 @@ Files:
 Deliverables: both clients consume `core` + `api-client`; screens for login, today's
 visit plan, accounts list/detail, log visit, pipeline board with stage moves, quota card.
 Mobile queues mutations offline and flushes on reconnect.
+Added during implementation: a `@fieldpulse/hooks` package so both clients share query
+hooks, cache keys and the offline-aware mutation path.
 Files:
+- `packages/hooks/src/{index,context,keys,queries,mutations}.ts(x)`
 - `apps/mobile/{app.json,package.json,babel.config.js,metro.config.js,tsconfig.json,App.tsx}`
 - `apps/mobile/src/{api,auth,storage,navigation}.ts(x)`, `apps/mobile/src/screens/*.tsx`
 - `apps/web/{index.html,package.json,vite.config.ts,tsconfig.json}`
