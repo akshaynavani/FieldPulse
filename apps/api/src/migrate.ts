@@ -5,8 +5,8 @@
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { loadConfig } from "../src/config.js";
-import { createPool, withTransaction } from "../src/db.js";
+import { loadConfig } from "./config.js";
+import { createPool, withTransaction } from "./db.js";
 
 const dir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../migrations");
 
