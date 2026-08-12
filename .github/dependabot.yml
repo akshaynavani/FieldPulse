@@ -1,0 +1,19 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      expo:
+        patterns: ["expo*", "react-native*", "@react-navigation/*"]
+      tooling:
+        patterns: ["eslint*", "@typescript-eslint/*", "prettier", "turbo", "typescript", "vitest"]
+    ignore:
+      # React/React Native versions are pinned to the Expo SDK; bump them with the SDK.
+      - dependency-name: "react"
+      - dependency-name: "react-native"
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
